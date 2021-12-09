@@ -1,6 +1,7 @@
 using Photon.Pun;
 using Photon.Realtime;
 using System.Collections.Generic;
+using Tanks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -9,6 +10,8 @@ public class GameManager : MonoBehaviourPunCallbacks
     public static GameManager instance;
     public static GameObject localPlayer;
     string gameVersion = "1";
+    private GameObject defaultSpawnPoint;
+
     void Awake()
     {
         if (instance != null)
@@ -21,6 +24,11 @@ public class GameManager : MonoBehaviourPunCallbacks
         PhotonNetwork.AutomaticallySyncScene = true;
         DontDestroyOnLoad(gameObject);
         instance = this;
+
+        defaultSpawnPoint = new GameObject("Default SpawnPoint");
+        defaultSpawnPoint.transform.position = new Vector3(0, 0, 0);
+        defaultSpawnPoint.transform.SetParent(transform, false);
+
     }
     void Start()
     {
@@ -66,7 +74,12 @@ public class GameManager : MonoBehaviourPunCallbacks
         {
             return;
         }
-        localPlayer = PhotonNetwork.Instantiate("TankPlayer", new Vector3(0, 0, 0), Quaternion.identity, 0);
+        var spawnPoint = GetRandomSpawnPoint();
+        localPlayer = PhotonNetwork.Instantiate(
+          "TankPlayer",
+          spawnPoint.position,
+          spawnPoint.rotation,
+          0);
         Debug.Log("Player Instance ID: " + localPlayer.GetInstanceID());
     }
     public static List<GameObject> GetAllObjectsOfTypeInScene<T>()
@@ -82,5 +95,11 @@ public class GameManager : MonoBehaviourPunCallbacks
         }
         return objectsInScene;
     }
-
+    private Transform GetRandomSpawnPoint()
+    {
+        var spawnPoints = GetAllObjectsOfTypeInScene<SpawnPoint>();
+        return spawnPoints.Count == 0
+        ? defaultSpawnPoint.transform
+        : spawnPoints[Random.Range(0, spawnPoints.Count)].transform;
+    }
 }
