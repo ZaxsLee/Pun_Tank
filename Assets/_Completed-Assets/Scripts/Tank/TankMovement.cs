@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using Tanks;
 
 namespace Complete
 {
@@ -14,15 +15,21 @@ namespace Complete
 
         private string m_MovementAxisName;          // The name of the input axis for moving forward and back.
         private string m_TurnAxisName;              // The name of the input axis for turning.
+        private string m_TurretAxisName;              // The name of the input axis for turning.
+
         private Rigidbody m_Rigidbody;              // Reference used to move the tank.
+        private Transform turret;
         private float m_MovementInputValue;         // The current value of the movement input.
         private float m_TurnInputValue;             // The current value of the turn input.
+        private float m_TurretInputValue;             // The current value of the turn input.
+
         private float m_OriginalPitch;              // The pitch of the audio source at the start of the scene.
         private ParticleSystem[] m_particleSystems; // References to all the particles systems used by the Tanks
 
         private void Awake ()
         {
             m_Rigidbody = GetComponent<Rigidbody> ();
+            turret = transform.FindAnyChild<Transform>("TankTurret").gameObject.transform;
         }
 
 
@@ -34,6 +41,7 @@ namespace Complete
             // Also reset the input values.
             m_MovementInputValue = 0f;
             m_TurnInputValue = 0f;
+            m_TurretInputValue = 0f;
 
             // We grab all the Particle systems child of that Tank to be able to Stop/Play them on Deactivate/Activate
             // It is needed because we move the Tank when spawning it, and if the Particle System is playing while we do that
@@ -64,6 +72,7 @@ namespace Complete
             // The axes names.
             m_MovementAxisName = "Vertical";
             m_TurnAxisName = "Horizontal";
+            m_TurretAxisName = "Turret";
             // Store the original pitch of the audio source.
             m_OriginalPitch = m_MovementAudio.pitch;
         }
@@ -74,8 +83,10 @@ namespace Complete
             // Store the value of both input axes.
             m_MovementInputValue = Input.GetAxis (m_MovementAxisName);
             m_TurnInputValue = Input.GetAxis (m_TurnAxisName);
+            m_TurretInputValue = Input.GetAxis(m_TurretAxisName);
 
-            EngineAudio ();
+
+            EngineAudio();
         }
 
 
@@ -112,6 +123,7 @@ namespace Complete
             // Adjust the rigidbodies position and orientation in FixedUpdate.
             Move ();
             Turn ();
+            Turret();
         }
 
 
@@ -135,6 +147,16 @@ namespace Complete
 
             // Apply this rotation to the rigidbody's rotation.
             m_Rigidbody.MoveRotation (m_Rigidbody.rotation * turnRotation);
+        }
+        private void Turret()
+        {
+           
+            // Determine the number of degrees to be turned based on the input, speed and time between frames.
+            float turn = m_TurretInputValue * m_TurnSpeed * Time.deltaTime;
+
+            // Make this into a rotation in the y axis.
+            Quaternion turnRotation = Quaternion.Euler(0f, turn, 0f);
+            turret.localRotation = turret.localRotation * turnRotation;
         }
     }
 }
