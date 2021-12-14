@@ -24,7 +24,7 @@ namespace Complete
         private bool m_Fired;                       // Whether or not the shell has been launched with this button press.
 
 
-        private void OnEnable()
+        public override void OnEnable()
         {
             base.OnEnable();
             // When the tank is turned on, reset the launch force and the UI
@@ -85,22 +85,20 @@ namespace Complete
 
         private void Fire()
         {
-            // Set the fired flag so only Fire is only called once.
             m_Fired = true;
-            // Create an instance of the shell and store a reference to it's rigidbody.
-            GameObject shellInstance = PhotonNetwork.Instantiate(
-                "CompleteShell",
-      m_FireTransform.position,
-                m_FireTransform.rotation,
-                0);
-
-            Rigidbody body = shellInstance.GetComponent<Rigidbody>();
-            // Set the shell's velocity to the launch force in the fire position's forward direction.
-            body.velocity = m_CurrentLaunchForce * m_FireTransform.forward;
-            // Change the clip to the firing clip and play it.
+            Rigidbody shellInstance = Instantiate(m_Shell, m_FireTransform.position, m_FireTransform.rotation) as Rigidbody;
+            photonView.RPC("FireOther", RpcTarget.Others, m_FireTransform.position);
+            shellInstance.velocity = m_CurrentLaunchForce * m_FireTransform.forward;
             m_ShootingAudio.clip = m_FireClip;
             m_ShootingAudio.Play();
-            // Reset the launch force. This is a precaution in case of missing button events.
+            m_CurrentLaunchForce = m_MinLaunchForce;
+        }
+        [PunRPC]
+        private void FireOther(Vector3 pos)
+        {
+            m_Fired = true;
+            Rigidbody shellInstance = Instantiate(m_Shell, pos, m_FireTransform.rotation) as Rigidbody;
+            shellInstance.velocity = m_CurrentLaunchForce * m_FireTransform.forward;
             m_CurrentLaunchForce = m_MinLaunchForce;
         }
     }
