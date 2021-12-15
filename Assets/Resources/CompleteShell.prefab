@@ -15,8 +15,8 @@ GameObject:
   - component: {fileID: 5409530}
   - component: {fileID: 10833074}
   - component: {fileID: 11426614}
-  - component: {fileID: 7727003251203794982}
-  - component: {fileID: -548308781157391881}
+  - component: {fileID: -5006162758081309958}
+  - component: {fileID: 2396247391470740557}
   m_Layer: 0
   m_Name: CompleteShell
   m_TagString: Untagged
@@ -201,7 +201,7 @@ MonoBehaviour:
   m_ExplosionForce: 1000
   m_MaxLifeTime: 2
   m_ExplosionRadius: 5
---- !u!114 &7727003251203794982
+--- !u!114 &-5006162758081309958
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -219,12 +219,11 @@ MonoBehaviour:
   Synchronization: 3
   OwnershipTransfer: 0
   observableSearch: 2
-  ObservedComponents:
-  - {fileID: -548308781157391881}
+  ObservedComponents: []
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
---- !u!114 &-548308781157391881
+--- !u!114 &2396247391470740557
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
